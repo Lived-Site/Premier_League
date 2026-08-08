@@ -2,7 +2,6 @@
 
 public class Equipo
 {
-    public static int IdStatic { get; set; }
     public int Id { get; set; }
     public string Nombre { get; set; }
     public string Descripcion { get; set; }
@@ -10,15 +9,21 @@ public class Equipo
     public string Ciudad { get; set; }
     public string Escudo { get; set; }
 
-    public Equipo(string Nombre, string Descripcion, DateTime FechaFundacion, string Ciudad, string Escudo)
+    private Equipo()
     {
-        this.Id = Equipo.IdStatic++;
-        this.Nombre = Nombre;
-        this.Descripcion = Descripcion;
-        this.FechaFundacion = FechaFundacion;
-        this.Ciudad = Ciudad;
-        this.Escudo = Escudo;
     }
-    
-    
+
+    public Equipo(
+        string nombre,
+        string descripcion,
+        DateTime fechaFundacion,
+        string ciudad,
+        string escudo)
+    {
+        Nombre = nombre;
+        Descripcion = descripcion;
+        FechaFundacion = fechaFundacion;
+        Ciudad = ciudad;
+        Escudo = escudo;
+    }
 }

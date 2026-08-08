@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Domain;
+﻿using Domain;
+using Microsoft.EntityFrameworkCore;
+
 namespace Repository.Context;
 
 public class PremierLeagueContext : DbContext
 {
-    public PremierLeagueContext(DbContextOptions<PremierLeagueContext> options) : base(options)
+    public PremierLeagueContext(DbContextOptions<PremierLeagueContext> options)
+        : base(options)
     {
     }
 
@@ -12,6 +14,7 @@ public class PremierLeagueContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(PremierLeagueContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            typeof(PremierLeagueContext).Assembly);
     }
 }

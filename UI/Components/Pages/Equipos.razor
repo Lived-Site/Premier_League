@@ -1,6 +1,30 @@
 ﻿@page "/Equipos"
+@using Service.DTO
+@inject Service.EquipoService EquipoService
+
 <h3>Equipos</h3>
 
+@if (equipos == null)
+{
+    <p>Cargando equipos...</p>
+}
+else
+{
+    @foreach (var equipo in equipos)
+    {
+        <div>
+            <h4>@equipo.Nombre</h4>
+            <p>@equipo.Descripcion</p>
+            <p>@equipo.Ciudad</p>
+        </div>
+    }
+}
+
 @code {
-    
+    private IEnumerable<EquipoDto>? equipos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        equipos = await EquipoService.ObtenerTodosAsync();
+    }
 }

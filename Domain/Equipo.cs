@@ -27,6 +27,7 @@ public class Equipo
         FechaFundacion = fechaFundacion;
         Ciudad = ciudad;
         Escudo = escudo;
+        Jugadores = new List<Jugador>();
     }
 
     public void AgregarJugador(Jugador jugador)

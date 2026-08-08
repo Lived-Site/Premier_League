@@ -27,4 +27,20 @@ public class EquipoService
             Escudo = equipo.Escudo
         });
     }
+    
+    public async Task<EquipoDto?> ObtenerPorIdAsync(int id)
+    {
+        var equipo = await _equiposRepository.GetByIdAsync(id);
+        if (equipo == null) return null;
+
+        return new EquipoDto
+        {
+            Id = equipo.Id,
+            Nombre = equipo.Nombre,
+            Descripcion = equipo.Descripcion,
+            FechaFundacion = equipo.FechaFundacion,
+            Ciudad = equipo.Ciudad,
+            Escudo = equipo.Escudo
+        };
+    }
 }

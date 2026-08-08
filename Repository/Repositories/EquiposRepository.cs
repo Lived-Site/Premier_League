@@ -24,7 +24,7 @@ public class EquiposRepository
         return await _context.Equipos.ToListAsync();
     }
 
-    public async Task<Equipo?> GetByIdAsync(Guid id)
+    public async Task<Equipo?> GetByIdAsync(int id)
     {
         return await _context.Equipos.FindAsync(id);
     }

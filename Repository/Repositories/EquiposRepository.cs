@@ -21,12 +21,16 @@ public class EquiposRepository
 
     public async Task<IEnumerable<Equipo>> GetAllAsync()
     {
-        return await _context.Equipos.ToListAsync();
+        return await _context.Equipos
+            .Include(e => e.Jugadores)
+            .ToListAsync();
     }
 
     public async Task<Equipo?> GetByIdAsync(int id)
     {
-        return await _context.Equipos.FindAsync(id);
+        return await _context.Equipos
+            .Include(e => e.Jugadores)
+            .FirstOrDefaultAsync(e => e.Id == id);
     }
 
     public async Task UpdateAsync(Equipo team)
@@ -35,7 +39,7 @@ public class EquiposRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(int id)
     {
         var team = await _context.Equipos.FindAsync(id);
 

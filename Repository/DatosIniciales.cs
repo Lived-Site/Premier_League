@@ -49,7 +49,7 @@ public static class DatosIniciales
                 "Club de fútbol inglés con sede en Brighton.",
                 new DateOnly(1901, 6, 24),
                 "Brighton",
-                "https://upload.wikimedia.org/wikipedia/en/c/c9/Brighton_%26_Hove_Albion_FC_crest.svg"
+                "/images/escudos/brighton.png"
             ),
 
             new Equipo(
@@ -65,7 +65,7 @@ public static class DatosIniciales
                 "Club de fútbol inglés con sede en Coventry.",
                 new DateOnly(1883, 1, 1),
                 "Coventry",
-                "https://upload.wikimedia.org/wikipedia/en/6/6c/Coventry_City_FC_logo.svg"
+                "/images/escudos/Coventry.png"
             ),
 
             new Equipo(
@@ -89,7 +89,7 @@ public static class DatosIniciales
                 "Club de fútbol inglés con sede en Londres.",
                 new DateOnly(1879, 1, 1),
                 "Londres",
-                "https://upload.wikimedia.org/wikipedia/en/e/e1/Fulham_FC_%28logo%29.svg"
+                "/images/escudos/fullham.png"
             ),
 
             new Equipo(
@@ -113,15 +113,15 @@ public static class DatosIniciales
                 "Club de fútbol inglés con sede en Leeds.",
                 new DateOnly(1919, 10, 17),
                 "Leeds",
-                "https://upload.wikimedia.org/wikipedia/en/0/0e/Leeds_United_F.C._logo.svg"
-            ),
+                "/images/escudos/leeds.png"
+                ),
 
             new Equipo(
                 "Liverpool",
                 "Club de fútbol inglés con sede en Liverpool.",
                 new DateOnly(1892, 6, 3),
                 "Liverpool",
-                "https://upload.wikimedia.org/wikipedia/commons/6/6f/Escudo-Liverpool.png"
+                "/images/escudos/Liverpool.png"
             ),
 
             new Equipo(
@@ -153,7 +153,7 @@ public static class DatosIniciales
                 "Club de fútbol inglés con sede en Nottingham.",
                 new DateOnly(1865, 1, 1),
                 "Nottingham",
-                "https://upload.wikimedia.org/wikipedia/en/4/49/Nottingham_Forest_F.C._logo.svg"
+                "/images/escudos/forest.png"
             ),
 
             new Equipo(
@@ -161,7 +161,7 @@ public static class DatosIniciales
                 "Club de fútbol inglés con sede en Sunderland.",
                 new DateOnly(1879, 1, 1),
                 "Sunderland",
-                "https://upload.wikimedia.org/wikipedia/en/7/7a/Sunderland_A.F.C._logo.svg"
+                "/images/escudos/sunderland.png"
             ),
 
             new Equipo(

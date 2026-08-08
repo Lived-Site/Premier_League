@@ -8,6 +8,8 @@ public class Equipo
     public DateOnly  FechaFundacion { get; set; }
     public string Ciudad { get; set; }
     public string Escudo { get; set; }
+    
+    public List<Jugador> Jugadores { get; set; }
 
     private Equipo()
     {
@@ -25,5 +27,15 @@ public class Equipo
         FechaFundacion = fechaFundacion;
         Ciudad = ciudad;
         Escudo = escudo;
+    }
+
+    public void AgregarJugador(Jugador jugador)
+    {
+        Jugadores.Add(jugador);
+    }
+
+    public void QuitarJugador(Jugador jugador)
+    {
+        Jugadores.Remove(jugador);
     }
 }

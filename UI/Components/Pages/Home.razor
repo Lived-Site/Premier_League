@@ -1,0 +1,33 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Home</PageTitle>
+
+<div>
+    <label for="btn-equipos">Equipos</label>
+    <button id="btn-equipos" @onclick="VerEquipos">Ver Equipos</button>
+    <br/>
+    <label for="btn-tabla">Tabla de Posiciones</label>
+    <button id="btn-tabla" @onclick="VerTabla">Ver Tabla</button>
+    <br/>
+    <label for="btn-resultados">Ingresar Resultados</label>
+    <button id="btn-resultados" @onclick="IngresarResultados">Ingresar</button>
+</div>
+
+@code {
+    private void VerEquipos()
+    {
+        NavigationManager.NavigateTo("/Equipos");
+    }
+
+    private void VerTabla()
+    {
+        NavigationManager.NavigateTo("/Tabla");
+    }
+
+    private void IngresarResultados()
+    {
+        NavigationManager.NavigateTo("/Resultados");
+    }
+}

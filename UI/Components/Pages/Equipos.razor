@@ -2,22 +2,43 @@
 @using Service.DTO
 @inject Service.EquipoService EquipoService
 
-<h3>Equipos</h3>
+<PageTitle>Equipos - Premier League</PageTitle>
+
+<h3>Equipos de la Premier League</h3>
 
 @if (equipos == null)
 {
-    <p>Cargando equipos...</p>
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando equipos...</span>
+    </div>
+}
+else if (!equipos.Any())
+{
+    <p>No se encontraron equipos registrados.</p>
 }
 else
 {
-    @foreach (var equipo in equipos)
-    {
-        <div>
-            <h4>@equipo.Nombre</h4>
-            <p>@equipo.Descripcion</p>
-            <p>@equipo.Ciudad</p>
-        </div>
-    }
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+        @foreach (var equipo in equipos)
+        {
+            <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1rem; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    @if (!string.IsNullOrEmpty(equipo.Escudo))
+                    {
+                        <!-- Ajuste de tamaño y ajuste de objeto para la imagen del escudo -->
+                        <div style="text-align: center; margin-bottom: 0.75rem;">
+                            <img src="@equipo.Escudo" alt="Escudo de @equipo.Nombre" style="width: 60px; height: 60px; object-fit: contain;" />
+                        </div>
+                    }
+                    <h4 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.25rem;">@equipo.Nombre</h4>
+                    <p style="color: #555; font-size: 0.9rem; margin-bottom: 1rem;">@equipo.Descripcion</p>
+                </div>
+                <div style="border-top: 1px solid #eee; padding-top: 0.5rem;">
+                    <small style="color: #777; font-size: 0.8rem;">Ciudad: @equipo.Ciudad | Fundación: @equipo.FechaFundacion.ToString("yyyy")</small>
+                </div>
+            </div>
+        }
+    </div>
 }
 
 @code {
@@ -25,6 +46,15 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        equipos = await EquipoService.ObtenerTodosAsync();
+        try
+        {
+            equipos = await EquipoService.ObtenerTodosAsync();
+        }
+        catch (Exception ex)
+        {
+            // Opcional: Manejo de errores de conexión a la BD
+            Console.WriteLine($"Error al cargar equipos: {ex.Message}");
+            equipos = Enumerable.Empty<EquipoDto>();
+        }
     }
 }

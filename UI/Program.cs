@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Repository;
 using Repository.Context;
 using Repository.Repositories;
 using Service;
@@ -20,6 +21,18 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider
+        .GetRequiredService<PremierLeagueContext>();
+
+    // Aplica automáticamente las migraciones pendientes en la base de datos
+    await context.Database.MigrateAsync();
+
+    // Carga los datos iniciales si la tabla está vacía
+    await DatosIniciales.CargarAsync(context);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

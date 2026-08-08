@@ -5,7 +5,7 @@ public class Equipo
     public int Id { get; set; }
     public string Nombre { get; set; }
     public string Descripcion { get; set; }
-    public DateTime FechaFundacion { get; set; }
+    public DateOnly  FechaFundacion { get; set; }
     public string Ciudad { get; set; }
     public string Escudo { get; set; }
 
@@ -16,7 +16,7 @@ public class Equipo
     public Equipo(
         string nombre,
         string descripcion,
-        DateTime fechaFundacion,
+        DateOnly fechaFundacion,
         string ciudad,
         string escudo)
     {

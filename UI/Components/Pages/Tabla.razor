@@ -1,6 +1,188 @@
 ﻿@page "/Tabla"
-<h3>Tabla</h3>
+@using Service.DTO
+@inject Service.EquipoService EquipoService
+
+<PageTitle>Tabla de posiciones</PageTitle>
+
+<div class="tabla-container">
+
+    <div class="tabla-header">
+        <h2>Premier League</h2>
+        <span>Tabla de posiciones</span>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="tabla-posiciones">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th class="equipo-header">Equipo</th>
+                    <th>PJ</th>
+                    <th>PG</th>
+                    <th>PE</th>
+                    <th>PP</th>
+                    <th>GF</th>
+                    <th>GC</th>
+                    <th>DG</th>
+                    <th>PTS</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            @if (equipos == null)
+            {
+                <p>Cargando tabla...</p>
+            }
+            else
+            {
+                @foreach (var equipo in equipos)
+                {
+                    <tr>
+                        <td class="posicion">
+                            @(equipos.ToList().IndexOf(equipo) + 1)
+                        </td>
+
+                        <td class="equipo">
+                            <div class="equipo-info">
+                                <img src="@equipo.Escudo"
+                                     alt="@equipo.Nombre"
+                                     class="escudo" />
+
+                                <span>@equipo.Nombre</span>
+                            </div>
+                        </td>
+
+                        <td>@equipo.PartidosJugados</td>
+                        <td>@equipo.PartidosGanados</td>
+                        <td>@equipo.PartidosEmpatados</td>
+                        <td>@equipo.PartidosPerdidos</td>
+                        <td>@equipo.GolesAFavor</td>
+                        <td>@equipo.GolesRecibidos</td>
+
+                        <td>
+                            @(equipo.GolesAFavor - equipo.GolesRecibidos)
+                        </td>
+
+                        <td class="puntos">
+                            @(equipo.PartidosGanados * 3 + equipo.PartidosEmpatados)
+                        </td>
+                    </tr>
+                }
+            }
+
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
 
 @code {
-    
+    private IEnumerable<EquipoDto>? equipos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var equiposObtenidos = await EquipoService.ObtenerTodosAsync();
+
+        equipos = EquipoService.ObtenerTablaOrdenada(equiposObtenidos);
+    }
 }
+
+<style>
+
+    .tabla-container {
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .tabla-header {
+        margin-bottom: 25px;
+    }
+
+    .tabla-header h2 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .tabla-header span {
+        color: #777;
+        font-size: 15px;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+    }
+
+    .tabla-posiciones {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    .tabla-posiciones thead {
+        background: #f4f4f4;
+    }
+
+    .tabla-posiciones th {
+        padding: 14px 10px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #666;
+        text-align: center;
+    }
+
+    .tabla-posiciones td {
+        padding: 14px 10px;
+        border-top: 1px solid #eee;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    .tabla-posiciones tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+    .tabla-posiciones tbody tr:hover {
+        background-color: #f8f8f8;
+    }
+
+    .posicion {
+        width: 45px;
+        font-weight: 700;
+        color: #777;
+    }
+
+    .equipo-header {
+        text-align: left !important;
+    }
+
+    .equipo {
+        text-align: left !important;
+        min-width: 220px;
+    }
+
+    .equipo-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+    }
+
+    .escudo {
+        width: 34px;
+        height: 34px;
+        object-fit: contain;
+    }
+
+    .puntos {
+        font-weight: 800;
+        font-size: 15px;
+    }
+
+</style>

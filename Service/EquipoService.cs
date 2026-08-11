@@ -43,4 +43,21 @@ public class EquipoService
             Escudo = equipo.Escudo
         };
     }
+    
+    
+    public IEnumerable<EquipoDto> ObtenerTablaOrdenada(IEnumerable<EquipoDto> equipos)
+    {
+        var tabla = equipos
+            .OrderByDescending(e => e.PartidosGanados * 3 + e.PartidosEmpatados)
+            .ThenByDescending(e => e.GolesAFavor - e.GolesRecibidos)
+            .ThenByDescending(e => e.GolesAFavor)
+            .ToList();
+
+        for (int i = 0; i < tabla.Count; i++)
+        {
+            tabla[i].Posicion = i + 1;
+        }
+
+        return tabla;
+    }
 }

@@ -11,6 +11,19 @@ public class Equipo
     
     public List<Jugador> Jugadores { get; set; }
 
+    public int PartidosJugados { get; set; } = 0;
+    
+    public int PartidosGanados { get; set; } = 0;
+    
+    public int PartidosEmpatados { get; set; } = 0;
+    
+    public int PartidosPerdidos { get; set; } = 0;
+    
+    
+    public int GolesRecibidos { get; set; } = 0;
+    
+    public int GolesAFavor { get; set; } = 0;
+
     private Equipo()
     {
     }

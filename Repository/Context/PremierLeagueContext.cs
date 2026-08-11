@@ -11,6 +11,8 @@ public class PremierLeagueContext : DbContext
     }
 
     public DbSet<Equipo> Equipos => Set<Equipo>();
+    public DbSet<Partido> Partidos => Set<Partido>();
+    public DbSet<Fecha> Fechas => Set<Fecha>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

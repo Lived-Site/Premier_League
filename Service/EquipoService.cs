@@ -13,11 +13,11 @@ public class EquipoService
         _equiposRepository = equiposRepository;
     }
 
-    public async Task<IEnumerable<EquipoDto>> ObtenerTodosAsync()
+    public async Task<IEnumerable<EquipoDTO>> ObtenerTodosAsync()
     {
         var equipos = await _equiposRepository.GetAllAsync();
 
-        return equipos.Select(equipo => new EquipoDto
+        return equipos.Select(equipo => new EquipoDTO
         {
             Id = equipo.Id,
             Nombre = equipo.Nombre,
@@ -28,12 +28,12 @@ public class EquipoService
         });
     }
     
-    public async Task<EquipoDto?> ObtenerPorIdAsync(int id)
+    public async Task<EquipoDTO?> ObtenerPorIdAsync(int id)
     {
         var equipo = await _equiposRepository.GetByIdAsync(id);
         if (equipo == null) return null;
 
-        return new EquipoDto
+        return new EquipoDTO
         {
             Id = equipo.Id,
             Nombre = equipo.Nombre,
@@ -45,7 +45,7 @@ public class EquipoService
     }
     
     
-    public IEnumerable<EquipoDto> ObtenerTablaOrdenada(IEnumerable<EquipoDto> equipos)
+    public IEnumerable<EquipoDTO> ObtenerTablaOrdenada(IEnumerable<EquipoDTO> equipos)
     {
         var tabla = equipos
             .OrderByDescending(e => e.PartidosGanados * 3 + e.PartidosEmpatados)

@@ -562,6 +562,14 @@ public static class DatosIniciales
         tottenham.AgregarJugador(new Jugador("Richarlison", "", "Brasil", "Delantero", 9));
 
         await context.Equipos.AddRangeAsync(equipos);
+        await context.Equipos.AddRangeAsync(equipos); 
+        
+        var fechas = new List<Fecha>();
+        for (int i = 1; i <= 38; i++)
+        {
+            fechas.Add(new Fecha(i));
+        } 
+        await context.Fechas.AddRangeAsync(fechas); 
         await context.SaveChangesAsync();
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Service.DTO;
 
-public class EquipoDto
+public class EquipoDTO
 {
     public int Id { get; set; }
     public string Nombre { get; set; }

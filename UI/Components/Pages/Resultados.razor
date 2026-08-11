@@ -1,6 +1,921 @@
 ﻿@page "/Resultados"
-<h3>Resultados</h3>
+@using Service.DTO
+@inject Service.PartidoService PartidoService
+@inject Service.EquipoService EquipoService
+@rendermode InteractiveServer
+
+<PageTitle>Partidos</PageTitle>
+
+<div class="resultados-container">
+<div class="pagina-header">
+        <div>
+            <h2>Partidos</h2>
+            <p>Planificación y resultados de la Premier League</p>
+        </div>
+    </div>
+    <div class="jornada-selector">
+        <button class="boton-jornada"@onclick="JornadaAnterior"disabled="@(jornadaActual == 1)">
+            ←</button>
+
+        <div class="jornada-info">
+            <span>JORNADA</span>
+            <strong>@jornadaActual</strong>
+            <small>de 38</small>
+        </div>
+    
+        <button class="boton-jornada"@onclick="JornadaSiguiente"disabled="@(jornadaActual == 38)">
+            →</button>
+    </div>
+    
+    @if (partidos != null && partidos.Any())
+    {
+    <div class="fecha-info">
+            <span>
+                @partidos.First().FechaPartido.ToLocalTime().ToString("dd/MM/yyyy")
+            </span>
+    </div>
+    }
+
+    <div class="partidos">
+
+        @if (partidos == null) {
+        <div class="mensaje">
+            Cargando partidos...
+        </div>
+        }
+        else if (!partidos.Any())
+        {
+        <div class="mensaje">
+            No hay partidos programados para esta jornada.
+        </div>
+        }
+        else
+        {
+        @foreach (var partido in partidos)
+        {
+        <div class="partido">
+
+            <div class="equipo equipo-local">
+                <span>
+                    @partido.EquipoLocalNombre
+                    </span>
+
+                @if (!string.IsNullOrEmpty(partido.EquipoLocalEscudo))
+                {
+                <img src="@partido.EquipoLocalEscudo"
+                     alt="@partido.EquipoLocalNombre"
+                     class="escudo" />
+                }
+                else
+                {
+                <div class="escudo">
+                    @partido.EquipoLocalNombre[0]
+                </div>
+                }
+
+            </div>
+
+            <div class="resultado">
+
+                @if (partido.GolesLocal.HasValue &&
+                partido.GolesVisitante.HasValue)
+                {
+                <strong>
+                    @partido.GolesLocal - @partido.GolesVisitante
+                </strong>
+
+                <span>Finalizado</span>
+                }
+                else
+                {
+                <strong>-</strong>
+
+                <span>Programado</span>
+                }
+
+            </div>
+
+            <div class="equipo equipo-visitante">
+
+                @if (!string.IsNullOrEmpty(partido.EquipoVisitanteEscudo))
+                {
+                <img src="@partido.EquipoVisitanteEscudo"
+                     alt="@partido.EquipoVisitanteNombre"
+                     class="escudo" />
+                }
+                else
+                {
+                <div class="escudo">
+                    @partido.EquipoVisitanteNombre[0]
+                </div>
+                }
+
+                <span>
+                            @partido.EquipoVisitanteNombre
+                        </span>
+
+            </div>
+
+            <div class="acciones-partido">
+
+                <button class="boton-resultado"
+                        @onclick="() => MostrarResultado(partido)">
+                    @(partido.GolesLocal.HasValue ? "Modificar resultado" : "Registrar resultado")
+                </button>
+
+                <button class="boton-cancelar-partido"
+                        @onclick="() => CancelarPartido(partido.Id)">
+                    Cancelar partido
+                </button>
+
+            </div>
+
+        </div> 
+        }
+        
+        }
+
+    </div>
+
+    <button class="agregar-partido"@onclick="MostrarFormulario">
+        + Planificar partido
+    </button>
+
+    @if (mostrandoFormulario)
+    {
+    <div class="formulario-planificacion">
+
+        <h3>Planificar partido</h3>
+
+        @if (!string.IsNullOrEmpty(errorPlanificacion))
+        {
+        <div class="error-planificacion">
+            @errorPlanificacion
+        </div>
+        }
+
+        <div class="campo">
+
+            <label>Equipo local</label>
+
+            <select @bind="equipoLocalId">
+
+                <option value="0">
+                    Seleccionar equipo
+                </option>
+
+                @if (equipos != null)
+                {
+                @foreach (var equipo in equipos)
+                {
+                <option value="@equipo.Id">
+                    @equipo.Nombre
+                </option>
+                }
+                }
+
+            </select>
+
+        </div>
+
+        <div class="campo">
+
+            <label>Equipo visitante</label>
+
+            <select @bind="equipoVisitanteId">
+
+                <option value="0">
+                    Seleccionar equipo
+                </option>
+
+                @if (equipos != null)
+                {
+                @foreach (var equipo in equipos)
+                {
+                <option value="@equipo.Id">
+                    @equipo.Nombre
+                </option>
+                }
+                }
+
+            </select>
+
+        </div>
+        
+        <div class="campo">
+
+            <label>Fecha y hora</label>
+
+            <input type="datetime-local"@bind="fechaPartido" />
+        </div>
+
+
+        <div class="acciones-formulario">
+            <button class="boton-cancelar"@onclick="CancelarPlanificacion">
+                Cancelar
+            </button>
+
+            <button class="boton-confirmar"@onclick="PlanificarPartido">
+                Planificar
+            </button>
+        </div>
+    </div>
+    }
+
+</div>
+
+@if (partidoEditandoId.HasValue)
+{
+<div class="modal-fondo">
+    <div class="modal-resultado">
+
+        <button class="modal-cerrar"@onclick="CancelarEdicionResultado">
+            X
+        </button>
+        <div class="modal-icono">
+            ⚽
+        </div>
+
+        <h3>
+            @(partidoEditandoId.HasValue ? "Resultado del partido" : "Resultado")
+        </h3>
+
+        <p class="modal-subtitulo">
+            Ingresa el resultado final
+        </p>
+
+        @if (!string.IsNullOrEmpty(errorResultado))
+        {
+        <div class="error-resultado">
+            @errorResultado
+        </div>
+        }
+
+        <div class="resultado-inputs">
+            <div class="equipo-resultado">
+                    <span>Local</span>
+                <input type="number"min="0"@bind="golesLocal" />
+            </div>
+            <div class="separador-resultado">
+                -
+            </div>
+            <div class="equipo-resultado">
+                    <span>Visitante</span>
+                <input type="number"min="0"@bind="golesVisitante" />
+            </div>
+        </div>
+
+        <div class="acciones-modal">
+
+            <button class="boton-modal-cancelar"@onclick="CancelarEdicionResultado">
+                Cancelar
+            </button>
+
+            <button class="boton-modal-guardar"@onclick="GuardarResultado">
+                Guardar resultado
+            </button>
+        </div>
+    </div>
+</div>
+}
+
 
 @code {
+    private int jornadaActual = 1;
+    private IEnumerable<PartidoDTO>? partidos;
+    private IEnumerable<EquipoDTO>? equipos;
+
+    private bool mostrandoFormulario = false;
+    private int equipoLocalId;
+    private int equipoVisitanteId;
+    private DateTime fechaPartido = DateTime.Now;
+    private string? errorPlanificacion;
+
+    private int? partidoEditandoId;
+    private int golesLocal;
+    private int golesVisitante;
+    private string? errorResultado;
     
+    protected override async Task OnInitializedAsync()
+    {
+        equipos = await EquipoService.ObtenerTodosAsync();
+        await CargarPartidos();
+    }
+
+    private void MostrarFormulario()
+    {
+        errorPlanificacion = null;
+        equipoLocalId = 0;
+        equipoVisitanteId = 0;
+        fechaPartido = DateTime.Today.AddDays(7).AddHours(15);
+        mostrandoFormulario = true;
+    }
+    
+    private void CancelarPlanificacion()
+    {
+        mostrandoFormulario = false;
+        errorPlanificacion = null;
+    }
+    
+    private async Task PlanificarPartido()
+    {
+        try
+        {
+            errorPlanificacion = null;
+            if (equipoLocalId == 0 || equipoVisitanteId == 0)
+            {
+                errorPlanificacion = "Debes seleccionar ambos equipos.";
+                return; 
+            }
+            if (equipoLocalId == equipoVisitanteId) 
+            {
+                errorPlanificacion = "El equipo local y visitante deben ser diferentes.";
+                return; 
+            }
+
+            await PartidoService.ProgramarPartido(jornadaActual, equipoLocalId, equipoVisitanteId, fechaPartido);
+            mostrandoFormulario = false;
+            await CargarPartidos();
+        }
+        catch (Exception ex)
+        {
+            errorPlanificacion = ex.Message;
+        }
+    }
+
+    private void MostrarResultado(PartidoDTO partido)
+    {
+        errorResultado = null;
+        partidoEditandoId = partido.Id;
+        golesLocal = partido.GolesLocal ?? 0;
+        golesVisitante = partido.GolesVisitante ?? 0;
+    }
+
+    private void CancelarEdicionResultado() 
+    {
+        partidoEditandoId = null;
+        errorResultado = null;
+    }
+    
+    private async Task GuardarResultado() 
+    {
+        try
+        {
+            errorResultado = null;
+            if (!partidoEditandoId.HasValue) return; 
+            if (golesLocal < 0 || golesVisitante < 0) {
+                errorResultado = "Los goles no pueden ser negativos.";
+                return;
+            }
+            await PartidoService.RegistrarResultado(partidoEditandoId.Value, golesLocal, golesVisitante);
+            partidoEditandoId = null;
+            await CargarPartidos(); 
+        }
+        catch (Exception ex) 
+        {
+            errorResultado = ex.Message;
+        }
+    }
+
+    private async Task CancelarPartido(int partidoId) 
+    {
+        try
+        {
+            errorPlanificacion = null;
+            await PartidoService.CancelarPartido(partidoId); 
+            await CargarPartidos();
+        }
+        catch (Exception ex)
+        {
+            errorPlanificacion = ex.Message;
+        }
+    }
+
+    private async Task CargarPartidos() 
+    {
+        partidos = await PartidoService.ObtenerPorJornadaAsync(jornadaActual);
+    }
+
+    private async Task JornadaAnterior() 
+    {
+        if (jornadaActual > 1) { 
+            jornadaActual--;
+            partidoEditandoId = null;
+            await CargarPartidos();
+        }
+    }
+
+    private async Task JornadaSiguiente() 
+    {
+        if (jornadaActual < 38) {
+            jornadaActual++;
+            partidoEditandoId = null;
+            await CargarPartidos(); 
+        } 
+    }
 }
+
+
+<style>
+
+    .resultados-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .pagina-header {
+        margin-bottom: 30px;
+    }
+
+    .pagina-header h2 {
+        margin: 0;
+        font-size: 30px;
+        font-weight: 700;
+    }
+
+    .pagina-header p {
+        margin-top: 6px;
+        color: #777;
+    }
+
+    .jornada-selector {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 10px;
+    }
+
+    .jornada-info {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+    }
+
+    .jornada-info span {
+        font-size: 13px;
+        color: #777;
+        font-weight: 600;
+    }
+
+    .jornada-info strong {
+        font-size: 32px;
+    }
+
+    .jornada-info small {
+        color: #888;
+    }
+
+    .boton-jornada {
+        width: 42px;
+        height: 42px;
+        border: 1px solid #ddd;
+        background: white;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 20px;
+    }
+
+    .boton-jornada:hover:not(:disabled) {
+        background: #f3f3f3;
+    }
+
+    .boton-jornada:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
+    .fecha-info {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #777;
+        font-size: 14px;
+    }
+
+    .partidos {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .partido {
+        display: grid;
+        grid-template-columns: 1fr 120px 1fr;
+        align-items: center;
+
+        background: white;
+        border: 1px solid #e3e3e3;
+        border-radius: 10px;
+
+        padding: 16px 25px;
+
+        min-height: 75px;
+    }
+
+    .equipo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+    }
+
+    .equipo-local {
+        justify-content: flex-end;
+    }
+
+    .equipo-visitante {
+        justify-content: flex-start;
+    }
+
+    .escudo {
+        width: 38px;
+        height: 38px;
+
+        border-radius: 50%;
+
+        background: #eee;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-weight: 700;
+        color: #555;
+
+        object-fit: contain;
+    }
+
+    .resultado {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .resultado strong {
+        font-size: 21px;
+    }
+
+    .resultado span {
+        font-size: 11px;
+        color: #777;
+        text-transform: uppercase;
+    }
+
+    .mensaje {
+        text-align: center;
+        padding: 40px;
+        color: #777;
+        border: 1px solid #e3e3e3;
+        border-radius: 10px;
+    }
+
+    .agregar-partido {
+        display: block;
+
+        margin: 25px auto 0;
+
+        padding: 12px 20px;
+
+        border: none;
+        border-radius: 7px;
+
+        background: #222;
+        color: white;
+
+        font-size: 14px;
+        font-weight: 600;
+
+        cursor: pointer;
+    }
+
+    .agregar-partido:hover {
+        opacity: 0.85;
+    }
+
+    .formulario-planificacion {
+        margin: 25px auto 0;
+        padding: 25px;
+        max-width: 500px;
+
+        background: white;
+        border: 1px solid #e3e3e3;
+        border-radius: 10px;
+    }
+
+    .formulario-planificacion h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    .campo {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 15px;
+    }
+
+    .campo label {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .campo select,
+    .campo input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .acciones-formulario {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .boton-cancelar,
+    .boton-confirmar {
+        padding: 10px 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .boton-cancelar {
+        background: white;
+        border: 1px solid #ccc;
+    }
+
+    .boton-confirmar {
+        background: #222;
+        color: white;
+        border: none;
+    }
+
+    .error-planificacion,
+    .error-resultado {
+        padding: 10px;
+        margin-bottom: 15px;
+
+        background: #ffe5e5;
+        border: 1px solid #ffb3b3;
+        border-radius: 6px;
+
+        color: #a00000;
+        font-size: 14px;
+    }
+
+    .acciones-partido {
+        grid-column: 1 / 4;
+
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        align-items: center;
+
+        margin-top: 10px;
+    }
+
+    .boton-resultado {
+        background-color: #2563eb;
+        color: white;
+
+        border: none;
+        border-radius: 6px;
+
+        padding: 7px 12px;
+
+        font-size: 13px;
+        font-weight: 600;
+
+        cursor: pointer;
+    }
+
+    .boton-resultado:hover {
+        background-color: #1d4ed8;
+    }
+    
+    .boton-cancelar-partido {
+        background-color: #dc2626;
+        color: white;
+
+        border: none;
+        border-radius: 6px;
+
+        padding: 7px 12px;
+
+        font-size: 13px;
+        font-weight: 600;
+
+        cursor: pointer;
+    }
+
+    .boton-cancelar-partido:hover {
+        background-color: #b91c1c;
+    }
+
+    .modal-fondo {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        height: 100%;
+
+        background: rgba(0, 0, 0, 0.45);
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        z-index: 1000;
+    }
+
+    .modal-resultado {
+        position: relative;
+
+        width: 420px;
+
+        background: white;
+
+        border-radius: 16px;
+
+        padding: 30px;
+
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+
+        text-align: center;
+    }
+
+    .modal-cerrar {
+        position: absolute;
+
+        top: 12px;
+        right: 15px;
+
+        width: 32px;
+        height: 32px;
+
+        border: none;
+
+        background: transparent;
+
+        font-size: 25px;
+
+        color: #777;
+
+        cursor: pointer;
+
+        border-radius: 50%;
+    }
+
+    .modal-cerrar:hover {
+        background: #f1f1f1;
+    }
+
+    .modal-icono {
+        width: 60px;
+        height: 60px;
+
+        margin: 0 auto 15px;
+
+        border-radius: 50%;
+
+        background: #eef4ff;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 30px;
+    }
+
+    .modal-resultado h3 {
+        margin: 0;
+
+        font-size: 22px;
+    }
+
+    .modal-subtitulo {
+        margin-top: 6px;
+
+        color: #777;
+
+        font-size: 14px;
+    }
+
+    .resultado-inputs {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 18px;
+
+        margin: 25px 0;
+    }
+    
+    .equipo-resultado {
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 8px;
+    }
+
+    .equipo-resultado span {
+        font-size: 13px;
+
+        color: #777;
+
+        font-weight: 600;
+    }
+
+    .equipo-resultado input {
+        width: 70px;
+
+        height: 55px;
+
+        text-align: center;
+
+        font-size: 25px;
+
+        font-weight: 700;
+
+        border: 1px solid #ccc;
+
+        border-radius: 8px;
+    }
+    
+    .equipo-resultado input:focus {
+        outline: none;
+
+        border-color: #2563eb;
+
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+    
+    .separador-resultado {
+        font-size: 25px;
+
+        font-weight: 700;
+
+        margin-top: 22px;
+    }
+    
+    .acciones-modal {
+        display: flex;
+
+        justify-content: center;
+
+        gap: 10px;
+
+        margin-top: 10px;
+    }
+    
+    .boton-modal-cancelar {
+        padding: 10px 18px;
+
+        border-radius: 7px;
+
+        border: 1px solid #ccc;
+
+        background: white;
+
+        cursor: pointer;
+
+        font-weight: 600;
+    }
+    
+    .boton-modal-cancelar:hover {
+        background: #f4f4f4;
+    }
+    
+    .boton-modal-guardar {
+        padding: 10px 18px;
+
+        border-radius: 7px;
+
+        border: none;
+
+        background: #2563eb;
+
+        color: white;
+
+        cursor: pointer;
+
+        font-weight: 600;
+    }
+
+    .boton-modal-guardar:hover {
+        background: #1d4ed8;
+    }
+
+</style>

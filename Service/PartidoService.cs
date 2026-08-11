@@ -9,53 +9,35 @@ public class PartidoService
     private readonly PartidosRepository _partidosRepository;
     private readonly EquiposRepository _equiposRepository;
 
-    public PartidoService(
-        PartidosRepository partidosRepository,
-        EquiposRepository equiposRepository)
+    public PartidoService(PartidosRepository partidosRepository, EquiposRepository equiposRepository)
     {
         _partidosRepository = partidosRepository;
         _equiposRepository = equiposRepository;
     }
 
-    public async Task ProgramarPartido(
-        int jornada,
-        int equipoLocalId,
-        int equipoVisitanteId,
-        DateTime fechaPartido)
+    public async Task ProgramarPartido(int jornada, int equipoLocalId, int equipoVisitanteId, DateTime fechaPartido)
     {
         fechaPartido = fechaPartido.ToUniversalTime();
-        var fecha = await _partidosRepository
-            .ObtenerFechaPorNumeroAsync(jornada);
+        var fecha = await _partidosRepository.ObtenerFechaPorNumeroAsync(jornada);
 
         if (fecha == null)
             throw new InvalidOperationException("La jornada no existe.");
 
-        var equipoLocal =
-            await _equiposRepository.GetByIdAsync(equipoLocalId);
+        var equipoLocal = await _equiposRepository.GetByIdAsync(equipoLocalId);
 
-        var equipoVisitante =
-            await _equiposRepository.GetByIdAsync(equipoVisitanteId);
+        var equipoVisitante = await _equiposRepository.GetByIdAsync(equipoVisitanteId);
 
         if (equipoLocal == null)
-            throw new InvalidOperationException(
-                "El equipo local no existe.");
+            throw new InvalidOperationException("El equipo local no existe.");
 
         if (equipoVisitante == null)
-            throw new InvalidOperationException(
-                "El equipo visitante no existe.");
+            throw new InvalidOperationException("El equipo visitante no existe.");
 
         if (equipoLocalId == equipoVisitanteId)
-            throw new InvalidOperationException(
-                "Un equipo no puede jugar contra sí mismo.");
+            throw new InvalidOperationException("Un equipo no puede jugar contra sí mismo.");
 
-        var partido = new Partido(
-            fecha,
-            equipoLocal,
-            equipoVisitante,
-            fechaPartido);
-
+        var partido = new Partido(fecha, equipoLocal, equipoVisitante, fechaPartido);
         fecha.AgregarPartido(partido);
-
         await _partidosRepository.AddAsync(partido);
     }
 
@@ -92,15 +74,12 @@ public class PartidoService
         int golesLocal,
         int golesVisitante)
     {
-        if (golesLocal < 0 || golesVisitante < 0)
-            throw new InvalidOperationException(
-                "Los goles no pueden ser negativos.");
+        if (golesLocal < 0 || golesVisitante < 0) throw new InvalidOperationException("Los goles no pueden ser negativos.");
 
         var partido = await _partidosRepository.GetByIdAsync(partidoId);
 
         if (partido == null)
-            throw new InvalidOperationException(
-                "El partido no existe.");
+            throw new InvalidOperationException("El partido no existe.");
 
         partido.RegistrarResultado(golesLocal, golesVisitante);
 
@@ -112,8 +91,7 @@ public class PartidoService
         var partido = await _partidosRepository.GetByIdAsync(partidoId);
 
         if (partido == null)
-            throw new InvalidOperationException(
-                "El partido no existe.");
+            throw new InvalidOperationException("El partido no existe.");
 
         partido.QuitarResultado();
 
@@ -125,8 +103,7 @@ public class PartidoService
         var partido = await _partidosRepository.GetByIdAsync(partidoId);
 
         if (partido == null)
-            throw new InvalidOperationException(
-                "El partido no existe.");
+            throw new InvalidOperationException("El partido no existe.");
 
         await _partidosRepository.DeleteAsync(partidoId);
     }

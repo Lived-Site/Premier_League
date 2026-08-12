@@ -15,7 +15,7 @@ builder.Services.AddDbContext<PremierLeagueContext>(options =>
 // Dependency Injection
 builder.Services.AddScoped<EquiposRepository>();
 builder.Services.AddScoped<EquipoService>();
-builder.Services.AddScoped<Service.JugadorService>();
+builder.Services.AddScoped<JugadorService>();
 builder.Services.AddScoped<PartidosRepository>();
 builder.Services.AddScoped<PartidoService>();
 // Blazor

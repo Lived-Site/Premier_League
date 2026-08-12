@@ -69,10 +69,7 @@ public class PartidoService
     }
     
     
-    public async Task RegistrarResultado(
-        int partidoId,
-        int golesLocal,
-        int golesVisitante)
+    public async Task RegistrarResultado(int partidoId, int golesLocal, int golesVisitante)
     {
         if (golesLocal < 0 || golesVisitante < 0) throw new InvalidOperationException("Los goles no pueden ser negativos.");
 
